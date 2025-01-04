@@ -1,63 +1,62 @@
 <script setup lang="ts">
 import { useRouter } from "#imports";
-import { reactive, ref } from 'vue';
+import { reactive, ref } from "vue";
 import AuthService from "~/service/public/auth-service";
-import httpClient from "~/service/private/http-client"
+import httpClient from "~/service/private/http-client";
 
-const imageUrl = "https://qvz.uz/wp-content/uploads/2020/10/c5125900b06ebbd499bddcb30a6e4799.jpg";
+const imageUrl =
+  "https://qvz.uz/wp-content/uploads/2020/10/c5125900b06ebbd499bddcb30a6e4799.jpg";
+const loginError = ref<string | null>(null);
+const isLoading = ref(false);
 
 useHead({
   title: "Login Page",
 });
+const router = useRouter();
 
 const form = reactive({
   username: "",
   password: "",
 });
-
 const errors = reactive({
   username: "",
   password: "",
 });
-
-const isValid = ref(true)
+const isValid = ref(true);
 
 function validateForm() {
   errors.username = form.username ? "" : "Username is required";
-  errors.password = form.password.length >= 6 ? "" : "Password must be at least 6 characters";
+  errors.password =
+    form.password.length >= 6 ? "" : "Password must be at least 6 characters";
 
-  isValid.value = !(errors.username || errors.password)
+  isValid.value = !(errors.username || errors.password);
 
   return isValid.value;
 }
-const router = useRouter();
-
-const loginError = ref<string | null>(null);
-const isLoading = ref(false);
 
 async function onSubmit() {
-  if(validateForm()){
-  isLoading.value = true;
-  loginError.value = null;
-      const payload = {
-        username: form.username,
-        password: form.password,
-      }
-  try {
-    const { data } = await AuthService.login(payload)
-        const { access_token, refresh_token } = data
-        httpClient.setTokens(access_token, refresh_token)
-    router.push("/todo");
-  } 
+  if (validateForm()) {
+    isLoading.value = true;
+    loginError.value = null;
+    const payload = {
+      username: form.username,
+      password: form.password,
+    };
+    try {
+      const { data } = await AuthService.login(payload);
+      const { access_token, refresh_token } = data;
+      httpClient.setTokens(access_token, refresh_token);
+      router.push("/todo");
+    } 
     catch (error: any) {
-        console.error("Login error: ", error);
-        loginError.value = "Invalid username or password"
-  } finally {
-    isLoading.value = false;
-  }
+      console.error("Login error: ", error);
+      loginError.value = "Invalid username or password";
+    } 
+    finally {
+      isLoading.value = false;
     }
-      console.log("Form submitted");
-
+  }
+  console.log("Form submitted");
 }
 </script>
 
@@ -71,7 +70,7 @@ async function onSubmit() {
     }"
   >
     <div
-      class="absolute inset-0 bg-gradient-to-br  to-purple-700 opacity-70"
+      class="absolute inset-0 bg-gradient-to-br to-purple-700 opacity-70"
     ></div>
     <UForm
       :state="form"
@@ -84,9 +83,9 @@ async function onSubmit() {
       <div class="mb-5 w-full">
         <UFormGroup label="Username" name="username" class="text-gray-800">
           <UInput v-model="form.username" placeholder="Enter your username" />
-            <p v-if="errors.username" class="text-red-600 text-sm">
-                {{ errors.username }}
-            </p>
+          <p v-if="errors.username" class="text-red-600 text-sm">
+            {{ errors.username }}
+          </p>
         </UFormGroup>
       </div>
       <div class="mb-7 w-full">
@@ -96,9 +95,9 @@ async function onSubmit() {
             type="password"
             placeholder="Enter your password"
           />
-            <p v-if="errors.password" class="text-red-600 text-sm">
-                {{ errors.password }}
-            </p>
+          <p v-if="errors.password" class="text-red-600 text-sm">
+            {{ errors.password }}
+          </p>
         </UFormGroup>
         <p v-if="loginError" class="text-red-500 text-sm mt-1">
           {{ loginError }}
@@ -123,7 +122,7 @@ async function onSubmit() {
     </UForm>
   </div>
 </template>
-
+ 
 <style scoped>
 .form-input {
   @apply border border-gray-300 rounded-md focus:border-blue-500 focus:ring-2 focus:ring-blue-300 transition-shadow duration-300 ease-in-out shadow-sm;

@@ -2,11 +2,13 @@
 import { onMounted, ref } from "vue";
 import type { Todo } from "@/models/todo";
 import todosService from "@/service/private/todos-service";
+import AddOpenModal from "~/layouts/AddOpenModal.vue";
+import ButtonEditModal from "~/layouts/ButtonEditModal.vue";
 
 const isModalOpen = ref(false);
 const isModaledit = ref(false);
 const selectedTodo = ref<Todo | null>(null);
-
+const todos = ref<Todo[]>([]);
 
 function openModal() {
   isModalOpen.value = true;
@@ -18,36 +20,37 @@ function editModal(todo: Todo) {
 }
 
 function closeModal() {
-  isModalOpen.value = false
-  isModaledit.value = false
+  isModalOpen.value = false;
+  isModaledit.value = false;
   selectedTodo.value = null;
 }
+
 function submit() {
-  isModalOpen.value = false
+  isModalOpen.value = false;
 }
 
-const todos = ref<Todo[]>([])
-
-  async function getTodos() {
-    try {
-      const { data } = await todosService.getTodos()
-      todos.value = data
-    }
-    catch (error: any) {
-      console.error("Xatolik:", error)
-    }
+async function getTodos() {
+  try {
+    const { data } = await todosService.getTodos();
+    todos.value = data;
+  } 
+  catch (error: any) {
+    console.error("Xatolik:", error);
   }
-
-  async function onDelete(id: string) {
-   try {
-     await todosService.deleteTodo(id)
-     todos.value = todos.value.filter((todo: Todo) => todo.id !== id)
-   }
-   catch (error) {
-    console.error("Xatolik", error)
-   }
 }
-  onMounted(getTodos)
+
+async function onDelete(id: string) {
+  try {
+    await todosService.deleteTodo(id);
+    todos.value = todos.value.filter((todo: Todo) => todo.id !== id);
+  } 
+  catch (error) {
+    console.error("Xatolik", error);
+  }
+}
+
+onMounted(getTodos);
+
 </script>
 
 <template>
@@ -104,16 +107,18 @@ const todos = ref<Todo[]>([])
             >
               <div class="flex space-x-2">
                 <UButton @click="editModal(item)">Edit</UButton>
-                <UButton color="red" @click="onDelete(item.id)"
-                  >Delete</UButton
-                >
+                <UButton color="red" @click="onDelete(item.id)">Delete</UButton>
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <LayoutsOpenModal v-if="isModalOpen" @submit="submit" @close="closeModal" />
-    <LayoutsEditModal v-if="isModaledit" :todo="selectedTodo" @close="closeModal" />
+    <AddOpenModal v-if="isModalOpen" @submit="submit" @close="closeModal" />
+    <ButtonEditModal
+      v-if="isModaledit"
+      :todo="selectedTodo"
+      @close="closeModal"
+    />
   </div>
 </template>

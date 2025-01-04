@@ -1,50 +1,53 @@
 <script setup lang="ts">
-import { defineEmits, reactive } from 'vue';
-import TodosService from '@/service/private/todos-service';
+import { defineEmits, reactive } from "vue";
+import TodosService from "@/service/private/todos-service";
 
 const emits = defineEmits<{
-  (event: 'onSubmit'): void;
+  (event: "onSubmit"): void;
   (event: "close"): void;
   (event: "isModalOpen"): void;
 }>();
 
 const form = reactive({
-  title: '',
-  description: '',
+  title: "",
+  description: "",
   done: false,
 });
 
 function closeModal() {
-  emits('close');
+  emits("close");
 }
 
 async function onSubmit() {
-    const payload = {
-        title: form.title,
-        description: form.description,
-        done: form.done, 
-    };
-    if(payload.title.trim() && payload.description.trim()) {
-      {
-        try {
-         await TodosService.createTodo(payload);
+  const payload = {
+    title: form.title,
+    description: form.description,
+    done: form.done,
+  };
+  
+  if (payload.title.trim() && payload.description.trim()) {
+    {
+      try {
+        await TodosService.createTodo(payload);
         location.reload();
-        emits('onSubmit');
-    } catch (error) {
+        emits("onSubmit");
+      } 
+      catch (error) {
         console.error("Error creating todo:", error);
-    }
       }
     }
-    else {
-      alert("title and description are required")
-    }
+  } else {
+    alert("title and description are required");
+  }
 }
 </script>
 
 <template>
   <div class="relative z-10">
     <Transition name="fade">
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      >
         <div class="bg-white rounded-lg p-8 w-1/2">
           <UForm @submit.prevent="onSubmit" :state="form">
             <UFormGroup label="Title" name="title">
