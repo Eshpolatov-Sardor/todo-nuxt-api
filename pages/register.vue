@@ -10,13 +10,16 @@ const imageUrl =
 const router = useRouter();
 
 const validateForm = yup.object().shape({
-    username: yup.string().required("Username is required"),
-    first_name: yup.string().required("First name is required"),
-    last_name: yup.string().required("Last name is required"),
-    password: yup.string().required("Password must be at least 6 characters").min(6),
-  });
-  
-  useHead({
+  username: yup.string().required("Username is required"),
+  first_name: yup.string().required("First name is required"),
+  last_name: yup.string().required("Last name is required"),
+  password: yup
+    .string()
+    .required("Password must be at least 6 characters")
+    .min(6),
+});
+
+useHead({
   title: "Register Page",
 });
 useForm({
@@ -24,20 +27,19 @@ useForm({
 });
 
 async function onSubmit(values: Record<string, any>) {
-    try {
-      const payload = {
-        username: values.username,
-        first_name: values.first_name,
-        last_name: values.last_name,
-        password: values.password,
-      };
-      await AuthService.register(payload);
-      router.push("/todo");
-    } 
-    catch (error) {
-      console.error("Registration error:", error);
-    }
+  try {
+    const payload = {
+      username: values.username,
+      first_name: values.first_name,
+      last_name: values.last_name,
+      password: values.password,
+    };
+    await AuthService.register(payload);
+    router.push("/todo");
+  } catch (error) {
+    console.error("Registration error:", error);
   }
+}
 </script>
 
 <template>
@@ -49,9 +51,10 @@ async function onSubmit(values: Record<string, any>) {
       backgroundRepeat: 'no-repeat',
     }"
   >
-  <Form 
-      v-slot="{ handleSubmit }" :validation-schema="validateForm"
-      class="relative z-10 w-[90%] max-w-[400px] bg-opacity-90 shadow-2xl rounded-xl px-8 pt-10 pb-8 "
+    <Form
+      v-slot="{ handleSubmit }"
+      :validation-schema="validateForm"
+      class="relative z-10 w-[90%] max-w-[400px] bg-opacity-90 shadow-2xl rounded-xl px-8 pt-10 pb-8"
     >
       <form @submit.prevent="handleSubmit($event, onSubmit)">
         <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
@@ -114,7 +117,7 @@ async function onSubmit(values: Record<string, any>) {
             to="/login"
             class="text-blue-500 font-medium hover:underline ml-1 transition duration-200"
           >
-            Register
+            Login
           </NuxtLink>
         </p>
       </form>

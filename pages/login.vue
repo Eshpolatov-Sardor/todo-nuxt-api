@@ -6,15 +6,18 @@ import AuthService from "~/service/public/auth-service";
 import httpClient from "~/service/private/http-client";
 
 const validateForm = yup.object().shape({
-    username: yup.string().required("Username is required"),
-    password: yup.string().required("Password must be at least 6 characters").min(6),
-  });
-  const imageUrl =
+  username: yup.string().required("Username is required"),
+  password: yup
+    .string()
+    .required("Password must be at least 6 characters")
+    .min(6),
+});
+const imageUrl =
   "https://qvz.uz/wp-content/uploads/2020/10/c5125900b06ebbd499bddcb30a6e4799.jpg";
-  
-  useForm({
-      validationSchema: validateForm,
-    }) 
+
+useForm({
+  validationSchema: validateForm,
+});
 useHead({
   title: "Login Page",
 });
@@ -36,7 +39,7 @@ async function onSubmit(values: Record<string, any>) {
   } finally {
   }
   console.log("Form submitted");
-};
+}
 </script>
 
 <template>
@@ -51,8 +54,9 @@ async function onSubmit(values: Record<string, any>) {
     <div
       class="absolute inset-0 bg-gradient-to-br to-purple-700 opacity-70"
     ></div>
-    <Form 
-      v-slot="{ handleSubmit }" :validation-schema="validateForm"
+    <Form
+      v-slot="{ handleSubmit }"
+      :validation-schema="validateForm"
       class="relative z-10 w-[90%] max-w-[400px] bg-opacity-90 shadow-2xl rounded-xl px-8 pt-10 pb-8"
     >
       <form @submit.prevent="handleSubmit($event, onSubmit)">
