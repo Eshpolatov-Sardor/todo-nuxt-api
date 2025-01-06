@@ -1,50 +1,35 @@
 <script setup lang="ts">
 import { useRouter } from "#imports";
-import { reactive, ref } from "vue";
+import * as yup from "yup";
+import { useForm, Field, Form, ErrorMessage } from "vee-validate";
 import AuthService from "@/service/public/auth-service";
 
 const imageUrl =
   "https://qvz.uz/wp-content/uploads/2020/10/c5125900b06ebbd499bddcb30a6e4799.jpg";
 
-useHead({
-  title: "Register Page",
-});
 const router = useRouter();
 
-const form = reactive({
-  username: "",
-  first_name: "",
-  last_name: "",
-  password: "",
+const validateForm = yup.object().shape({
+    username: yup.string().required("Username is required"),
+    first_name: yup.string().required("First name is required"),
+    last_name: yup.string().required("Last name is required"),
+    password: yup.string().required("Password must be at least 6 characters").min(6),
+  });
+  
+  useHead({
+  title: "Register Page",
 });
-const errors = reactive({
-  username: "",
-  first_name: "",
-  last_name: "",
-  password: "",
+useForm({
+  validationSchema: validateForm,
 });
-const isValid = ref(true);
 
-function validateForm() {
-  errors.username = form.username ? "" : "Username is required";
-  errors.first_name = form.first_name ? "" : "First Name is required";
-  errors.last_name = form.last_name ? "" : "Last Name is required";
-  errors.password =form.password.length >= 6 ? "" : "Password must be at least 6 characters";
-
-  isValid.value = !(errors.username || errors.first_name || errors.last_name || errors.password
-  );
-
-  return isValid.value;
-}
-
-async function onSubmit() {
-  if (validateForm()) {
+async function onSubmit(values: Record<string, any>) {
     try {
       const payload = {
-        username: form.username,
-        first_name: form.first_name,
-        last_name: form.last_name,
-        password: form.password,
+        username: values.username,
+        first_name: values.first_name,
+        last_name: values.last_name,
+        password: values.password,
       };
       await AuthService.register(payload);
       router.push("/todo");
@@ -53,7 +38,6 @@ async function onSubmit() {
       console.error("Registration error:", error);
     }
   }
-}
 </script>
 
 <template>
@@ -65,66 +49,76 @@ async function onSubmit() {
       backgroundRepeat: 'no-repeat',
     }"
   >
-    <UForm
-      :state="form"
-      @submit.prevent="onSubmit"
-      class="relative z-10 w-[90%] max-w-[450px] text-gray-800 bg-opacity-40 shadow-2xl rounded-2xl px-10 pt-10 pb-8 flex flex-col"
+  <Form 
+      v-slot="{ handleSubmit }" :validation-schema="validateForm"
+      class="relative z-10 w-[90%] max-w-[400px] bg-opacity-90 shadow-2xl rounded-xl px-8 pt-10 pb-8 "
     >
-      <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
-        Create Your Account
-      </h2>
-      <div class="mb-5">
-        <UFormGroup label="User Name" name="username" class="text-gray-800">
-          <UInput v-model="form.username" placeholder="User Name" />
-          <p v-if="errors.username" class="text-red-600 text-sm">
-            {{ errors.username }}
-          </p>
-        </UFormGroup>
-      </div>
-      <div class="mb-5">
-        <UFormGroup label="First Name" name="first_name">
-          <UInput v-model="form.first_name" placeholder="First Name" />
-          <p v-if="errors.first_name" class="text-red-600 text-sm">
-            {{ errors.first_name }}
-          </p>
-        </UFormGroup>
-      </div>
-      <div class="mb-5">
-        <UFormGroup label="Last Name" name="last_name">
-          <UInput v-model="form.last_name" placeholder="Last Name" />
-          <p v-if="errors.last_name" class="text-red-600 text-sm">
-            {{ errors.last_name }}
-          </p>
-        </UFormGroup>
-      </div>
-      <div class="mb-7">
-        <UFormGroup label="Password" name="password">
-          <UInput
-            v-model="form.password"
-            type="password"
-            placeholder="Enter your Password"
-          />
-          <p v-if="errors.password" class="text-red-600 text-sm">
-            {{ errors.password }}
-          </p>
-        </UFormGroup>
-      </div>
-      <UButton
-        type="submit"
-        class="w-full pl-40 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 text-white py-2 rounded-lg shadow-md transition-all duration-300 ease-in-out"
-      >
-        Register
-      </UButton>
-      <p class="mt-6 text-gray-700 text-sm text-center">
-        Already have an account?
-        <NuxtLink
-          to="/login"
-          class="text-blue-500 hover:underline transition duration-200"
+      <form @submit.prevent="handleSubmit($event, onSubmit)">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+          Welcome Back
+        </h2>
+        <div class="mb-5 w-full">
+          <div class="text-gray-800 flex flex-col">
+            <label for="username" class="mb-2">Username</label>
+            <Field
+              name="username"
+              placeholder="Enter your username"
+              class="form-input"
+            />
+            <ErrorMessage name="username" class="text-red-500 text-sm" />
+          </div>
+        </div>
+        <div class="mb-5 w-full">
+          <div class="text-gray-800 flex flex-col">
+            <label for="first_name" class="mb-2">First Name</label>
+            <Field
+              name="first_name"
+              placeholder="Enter your first_name"
+              class="form-input"
+            />
+            <ErrorMessage name="first_name" class="text-red-500 text-sm" />
+          </div>
+        </div>
+        <div class="mb-5 w-full">
+          <div class="text-gray-800 flex flex-col">
+            <label for="last_name" class="mb-2">Last Name</label>
+            <Field
+              name="last_name"
+              placeholder="Enter your last_name"
+              class="form-input"
+            />
+            <ErrorMessage name="last_name" class="text-red-500 text-sm" />
+          </div>
+        </div>
+        <div class="mb-7 w-full">
+          <div class="text-gray-800 flex flex-col">
+            <label for="password" class="mb-2">Password</label>
+            <Field
+              name="password"
+              type="password"
+              placeholder="Enter your password"
+              class="form-input"
+            />
+            <ErrorMessage name="password" class="text-red-500 text-sm" />
+          </div>
+        </div>
+        <UButton
+          type="submit"
+          class="w-full text-center pl-36 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-purple-500 hover:to-blue-500 text-white font-semibold py-2 rounded-lg shadow-md transition-all duration-300 ease-in-out"
         >
           Login
-        </NuxtLink>
-      </p>
-    </UForm>
+        </UButton>
+        <p class="mt-6 text-gray-700 text-sm text-center">
+          Don't have an account?
+          <NuxtLink
+            to="/login"
+            class="text-blue-500 font-medium hover:underline ml-1 transition duration-200"
+          >
+            Register
+          </NuxtLink>
+        </p>
+      </form>
+    </Form>
   </div>
 </template>
 
